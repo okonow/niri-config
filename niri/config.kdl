@@ -1,0 +1,152 @@
+// Автозапуск панели, уведомлений, обоев и апплетов сети/блютус
+spawn-at-startup "waybar"
+spawn-at-startup "mako"
+spawn-at-startup "nm-applet" "--indicator"
+spawn-at-startup "blueman-applet"
+spawn-at-startup "xwayland-satellite"
+// ОБОИ: положите картинку в ~/Pictures/wallpaper.jpg (или поправьте путь).
+// -m fill = растянуть с обрезкой по краям; -c = цвет, пока картинка не загрузилась
+spawn-at-startup "sh" "-c" "exec swaybg -i \"$HOME/non/pics/winxp-nowadays.jpg\" -m fill -c '#1e1e2e'"
+
+// Обои "стоят на месте": swaybg кладётся в подложку (backdrop), а фон рабочих столов прозрачный.
+// Так обои видны и в обычном режиме, и в обзоре, а серых полос между столами нет.
+layer-rule {
+    match namespace="^wallpaper$"
+    place-within-backdrop true
+}
+
+overview {
+    workspace-shadow {
+        off
+    }
+}
+
+// Скриншоты: всегда копируются в буфер обмена, а ещё сохраняются сюда.
+// (mkdir -p ~/Pictures/Screenshots). Чтобы только в буфер: screenshot-path null
+screenshot-path "~/Pictures/Screenshots/%Y-%m-%d_%H-%M-%S.png"
+
+// Просить приложения не рисовать свои заголовки окон (client-side decorations).
+// В niri своих заголовков нет, так что окна станут без заголовков.
+prefer-no-csd
+
+
+input {
+    keyboard {
+        xkb {
+            // Раскладка: Английская и Русская. Переключение по Caps Lock
+            layout "us,ru"
+        }
+    }
+    touchpad {
+        click-method "clickfinger"
+        tap
+        // Чем выше accel-speed (максимум 1.0), тем дальше "уезжает" лента за одно движение пальцев.
+        // Заодно ускоряется и курсор. В niri нет отдельной настройки чувствительности 3-пальцевого свайпа.
+        accel-speed 1.0
+        // Двухпальцевый скролл в приложениях (по сообщениям пользователей, может влиять и на свайп - не проверял)
+        scroll-factor 2.5
+    }
+    mouse {
+        accel-speed 0.7
+    }
+}
+
+animations {
+    // Горизонтальная прокрутка (3-пальцевый свайп влево-вправо).
+    // После отпускания пальцев niri сам считает "инерцию" по скорости свайпа
+    // и доводит ленту до ближайшей колонки пружиной.
+    // damping-ratio > 1 = пружина "перезатухающая": не колеблется и не дрожит,
+    // даже если её запустили с большой скоростью.
+    // stiffness: больше = быстрее и "жёстче" доводка (у вас было 10 - это очень вяло).
+    horizontal-view-movement {
+        spring damping-ratio=1.15 stiffness=350 epsilon=0.0001
+    }
+
+    // Переключение рабочих столов (3-пальцевый свайп вверх-вниз)
+    workspace-switch {
+        spring damping-ratio=1.15 stiffness=400 epsilon=0.0001
+    }
+}
+
+// Минималистичный внешний вид (без рамок окон, только тонкий бордер у активного)
+layout {
+    // Прозрачный фон столов: за ними видны обои из backdrop
+    background-color "transparent"
+
+    // Окна на весь экран: без отступов, без рамки
+    gaps 0
+    default-column-width { proportion 1.0; }
+
+    // Рамка вокруг активного окна не нужна, когда окно на весь экран.
+    // Если вернётесь к узким колонкам - замените на блок ниже:
+    //   focus-ring { width 2; active-color "#89b4fa"; inactive-color "#45475a"; }
+    focus-ring {
+        off
+    }
+}
+
+// Хотите НАСТОЯЩИЙ полноэкранный режим (панель скрывается под окном)?
+// Раскомментируйте, но тогда панель видна только на пустом столе:
+// window-rule {
+//     open-fullscreen true
+// }
+
+binds {
+    // Системные хоткеи (dwm-style)
+    Mod+Return { spawn "kitty"; }
+    Mod+D      { spawn "fuzzel"; }
+    Mod+Q      { close-window; }
+    Mod+Shift+E { quit; }
+    
+    // Управление звуком и яркостью (клавиши ноутбука)
+    XF86AudioRaiseVolume { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%+"; }
+    XF86AudioLowerVolume { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"; }
+    XF86AudioMute        { spawn "wpctl" "set-mute"   "@DEFAULT_AUDIO_SINK@" "toggle"; }
+    XF86MonBrightnessUp   { spawn "brightnessctl" "set" "+10%"; }
+    XF86MonBrightnessDown { spawn "brightnessctl" "set" "10%-"; }
+
+    // Навигация окнами (Стрелочки или Vim-клавиши HJKL)
+    Mod+Left  { focus-column-left; }
+    Mod+Right { focus-column-right; }
+    Mod+H     { focus-column-left; }
+    Mod+L     { focus-column-right; }
+    
+    Mod+Up    { focus-window-or-workspace-up; }
+    Mod+Down  { focus-window-or-workspace-down; }
+    Mod+K     { focus-window-or-workspace-up; }
+    Mod+J     { focus-window-or-workspace-down; }
+
+    // Перемещение окон в ленте
+    Mod+Shift+Left  { move-column-left; }
+    Mod+Shift+Right { move-column-right; }
+    Mod+Shift+H     { move-column-left; }
+    Mod+Shift+L     { move-column-right; }
+    
+    // Изменение размера окон
+    Mod+Minus { set-column-width "-10%"; }
+    Mod+Equal { set-column-width "+10%"; }
+    Mod+M { set-column-width "50%"; }
+    Mod+F     { maximize-column; }
+
+    // Прокрутка ленты двумя пальцами по тачпаду, пока зажат Super.
+    // Каждый "щелчок" = одна колонка (cooldown-ms не даёт пролистать всё сразу).
+    Mod+TouchpadScrollRight cooldown-ms=250 { focus-column-right; }
+    Mod+TouchpadScrollLeft  cooldown-ms=250 { focus-column-left; }
+
+    // Скриншоты (встроенные в niri): выделение области / весь экран / окно
+    Mod+Shift+S { screenshot; }
+    Mod+Ctrl+S  { screenshot-screen; }
+    Mod+Alt+S   { screenshot-window; }
+    Print       { screenshot; }
+
+    // Обзор всех столов и окон
+    Mod+O { toggle-overview; }
+
+    // Смена раскладки по Super + Space
+    Mod+Space { switch-layout "next"; }
+
+    // Показать/скрыть панель по Super + B
+    // (waybar переключает видимость по сигналу SIGUSR1)
+    Mod+B { spawn "pkill" "-SIGUSR1" "waybar"; }
+}
+

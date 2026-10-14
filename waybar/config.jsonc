@@ -1,0 +1,59 @@
+{
+    "layer": "top",
+    "position": "top",
+    // Тонкая панель как в dwm. Реальную высоту дополнительно ограничивает style.css
+    "height": 22,
+    "spacing": 0,
+    // Скрытие/показ делается сигналом SIGUSR1 (bind Mod+B в niri), отдельный ipc не нужен
+    "start_hidden": false,
+    // Хотите, чтобы панель при запуске была скрыта (показ по Mod+B)? Поставьте true
+
+    "modules-left": ["niri/workspaces", "niri/window"],
+    "modules-center": ["clock"],
+    "modules-right": ["niri/language", "wireplumber", "battery", "tray"],
+
+    "niri/workspaces": {
+        "format": "{index}",
+        "disable-click": false
+    },
+
+    "niri/window": {
+        "format": "{title}",
+        "max-length": 60,
+        "icon": false
+    },
+
+    "niri/language": {
+        // \uf11c = иконка клавиатуры (Nerd Font / Font Awesome)
+        "format": "\uf11c  {short}"
+    },
+
+    "clock": {
+        "format": "{:%H:%M}",
+        "format-alt": "{:%d.%m.%Y  %H:%M}",
+        "tooltip-format": "{:%A, %d %B %Y}"
+    },
+
+    "wireplumber": {
+        "format": "{icon}  {volume}%",
+        "format-muted": "\uf026  mute",
+        "format-icons": ["\uf027", "\uf027", "\uf028"],
+        "scroll-step": 5,
+        "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+        "tooltip": false
+    },
+
+    // Сам скрывается, если батареи нет (десктоп)
+    "battery": {
+        "format": "{icon}  {capacity}%",
+        "format-charging": "\uf0e7  {capacity}%",
+        "format-icons": ["\uf244", "\uf243", "\uf242", "\uf241", "\uf240"],
+        "states": { "warning": 25, "critical": 10 },
+        "tooltip": false
+    },
+
+    "tray": {
+        "icon-size": 14,
+        "spacing": 8
+    }
+}

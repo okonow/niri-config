@@ -1,0 +1,65 @@
+@define-color bar_bg rgb(0,0,0);
+@define-color bar_fg rgb(205,214,244);
+@define-color bar_dim rgba(205,214,244,0.6);
+
+/* ВАЖНО: правьте этот файл, а не style.css.
+   style.css генерируется скриптом adaptive.py (цвета + этот файл).
+   Переменные @bar_bg, @bar_fg, @bar_dim подставляет скрипт. */
+
+* {
+    /* Текстовый шрифт идёт первым - у него хорошая кириллица.
+       Иконки (Nerd Font) подхватываются из Symbols Nerd Font. */
+    font-family: "Inter", "Noto Sans", "DejaVu Sans", "Symbols Nerd Font", "JetBrainsMono Nerd Font", sans-serif;
+    font-size: 13px;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+window#waybar {
+    background: @bar_bg;
+    color: @bar_fg;
+    transition: background-color 0.35s ease;
+}
+
+#clock, #wireplumber, #battery, #language, #tray, #window {
+    padding: 0 10px;
+}
+
+/* --- Рабочие столы --- */
+#workspaces button {
+    padding: 0 8px;
+    color: @bar_dim;
+    background: transparent;
+    border-bottom: 2px solid transparent;
+}
+
+#workspaces button:hover {
+    background: alpha(@bar_fg, 0.12);
+    color: @bar_fg;
+}
+
+#workspaces button.active,
+#workspaces button.focused {
+    color: @bar_fg;
+    border-bottom-color: @bar_fg;
+}
+
+/* --- Заголовок окна --- */
+#window { color: @bar_dim; }
+
+/* --- Часы --- */
+#clock { color: @bar_fg; font-weight: bold; }
+
+/* --- Правая часть --- */
+#language, #wireplumber, #battery { color: @bar_fg; }
+#wireplumber.muted { color: @bar_dim; }
+#battery.warning  { color: #f9e2af; }
+#battery.critical { color: #f38ba8; }
+
+#tray { padding: 0 6px; }
+#tray > .passive         { -gtk-icon-effect: dim; }
+#tray > .needs-attention { -gtk-icon-effect: highlight; }
